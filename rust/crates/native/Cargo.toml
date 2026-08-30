@@ -1,0 +1,24 @@
+[package]
+name = "shotscript-license-native"
+version = "0.1.0"
+edition = "2021"
+description = "ShotScript 激活码校验原生模块（napi-rs，供 Electron 主进程加载）"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+napi = { version = "2", default-features = false, features = ["napi8"] }
+napi-derive = "2"
+shotscript-license-core = { path = "../license-core" }
+base64 = "0.22"
+sha2 = "0.10"
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+lto = true
+opt-level = "s"
+strip = true

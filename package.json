@@ -1,0 +1,78 @@
+{
+  "name": "shotscript",
+  "version": "0.1.0",
+  "description": "ShotScript 剧本工坊 - 面向视频创作者的开源 AI 文案工具（免费开源版）",
+  "main": "main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "start:shot": "SHOTSCRIPT_SCREENSHOT=1 electron .",
+    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win"
+  },
+  "author": "ShotScript Team",
+  "license": "MIT",
+  "build": {
+    "appId": "com.shotscript.app",
+    "productName": "ShotScript 剧本工坊",
+    "asar": true,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main/**/*",
+      "preload/**/*",
+      "renderer/**/*",
+      "src/**/*",
+      "rust/build/**/*",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "rust/build/*.node"
+    ],
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["arm64"]
+        }
+      ],
+      "category": "public.app-category.productivity",
+      "identity": null,
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    },
+    "dmg": {
+      "title": "ShotScript 剧本工坊 ${version}",
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "artifactName": "${productName}-Setup-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    }
+  },
+  "devDependencies": {
+    "electron": "^41.2.1",
+    "electron-builder": "^26.15.3"
+  },
+  "dependencies": {}
+}

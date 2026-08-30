@@ -1,0 +1,24 @@
+node_modules/
+dist/
+out/
+screenshot.png
+screenshot-*.png
+*.log
+.DS_Store
+# Rust 构建产物与密钥（严禁开源）
+rust/target/
+rust/build/
+rust/keys/
+# 激活码签发 CLI（含私钥签发逻辑，严禁开源）
+rust/crates/tool/
+# 本地运行残留
+rust/*.node
+# Pro 闭源模块：本地 AI 推理实现（含模型信息，严禁开源）
+src/llm/
+# Pro 闭源内部文档（不随开源仓库分发）
+docs/LLM_PRO_本地润色.md
+# 依赖锁文件（含 Pro 推理引擎依赖，不入库）
+package-lock.json
+
+# Pro 本地润色端到端测试（闭源，不入库）
+test/e2e_llm_main.js

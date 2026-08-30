@@ -1,0 +1,12 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/license-core",
+    "crates/native",
+    "crates/tool",
+]
+
+[profile.release]
+lto = true
+opt-level = "s"
+strip = true

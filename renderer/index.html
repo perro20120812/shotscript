@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';" />
+  <title>ShotScript 剧本工坊</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- 顶部拖拽区 -->
+  <div class="titlebar-drag"></div>
+
+  <div class="app-shell">
+    <!-- ===================== 侧边栏 ===================== -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">S</div>
+        <div class="brand-text">
+          <div class="brand-name">ShotScript</div>
+          <div class="brand-sub">剧本工坊 · 开源版</div>
+        </div>
+      </div>
+
+      <nav class="nav" id="nav">
+        <button class="nav-item active" data-page="page-templates">
+          <span class="nav-icon">◧</span>固定模板
+        </button>
+        <button class="nav-item" data-page="page-compress">
+          <span class="nav-icon">↕</span>算法精简
+        </button>
+        <button class="nav-item" data-page="page-storyboard">
+          <span class="nav-icon">☷</span>规则分镜
+        </button>
+        <button class="nav-item nav-pro" data-page="page-pro">
+          <span class="nav-icon">∞</span>无限模板
+          <span class="pro-badge">Pro</span>
+        </button>
+        <button class="nav-item nav-pro" data-page="page-llm">
+          <span class="nav-icon">✦</span>本地润色
+          <span class="pro-badge">Pro</span>
+        </button>
+        <button class="nav-item" data-page="page-settings">
+          <span class="nav-icon">⚙</span>设置
+        </button>
+        <button class="nav-item" data-page="page-about">
+          <span class="nav-icon">i</span>关于
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="pro-btn" id="proUpgradeBtn">
+          <span class="pro-crown">◆</span>
+          <span class="pro-text">
+            <strong>升级 Pro</strong>
+            <small>无限模板 · AI 润色</small>
+          </span>
+        </button>
+        <div class="version-tag">免费开源版 v0.1.0</div>
+      </div>
+    </aside>
+
+    <!-- ===================== 内容区 ===================== -->
+    <main class="content">
+
+      <!-- 页面一：固定模板 -->
+      <section id="page-templates" class="page active">
+        <header class="page-header">
+          <h1>固定模板</h1>
+          <p class="page-desc">6 款手写精修口播模板，覆盖主流平台，填入占位符一键成稿。</p>
+        </header>
+
+        <div class="template-picker" id="templatePicker"></div>
+
+        <div class="card">
+          <div class="card-title">模板预览 <span class="muted" id="templateMeta"></span></div>
+          <div class="template-body" id="templateBody"></div>
+        </div>
+
+        <div class="card" id="placeholderCard" hidden>
+          <div class="card-title">填写占位符</div>
+          <div class="placeholder-grid" id="placeholderGrid"></div>
+          <div class="row-actions">
+            <button class="btn btn-primary" id="genBtn">生成口播稿</button>
+            <button class="btn" id="clearPlaceholdersBtn">清空</button>
+          </div>
+        </div>
+
+        <div class="card" id="templateResultCard" hidden>
+          <div class="card-title">生成结果
+            <button class="btn btn-sm" id="copyTemplateBtn">复制</button>
+          </div>
+          <div class="result-box" id="templateResult"></div>
+        </div>
+      </section>
+
+      <!-- 页面二：算法精简 -->
+      <section id="page-compress" class="page">
+        <header class="page-header">
+          <h1>算法精简</h1>
+          <p class="page-desc">纯本地算法，零云端依赖：去口头禅、删填充词、合并重复、压缩句式，保护专名与数字。</p>
+        </header>
+
+        <div class="card">
+          <div class="card-title">口播稿原文</div>
+          <textarea id="compressInput" class="textarea" placeholder="粘贴你的口播稿，例如：&#10;呃，大家好呀，今天想跟大家分享一下我觉得真的超级好用的一个方法，这个方法呢我用了大概三个月了，效果真的特别特别的明显，大家一定要试试看……"></textarea>
+          <div class="char-count" id="inputCount">0 字</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">压缩档位</div>
+          <div class="ratio-group">
+            <label class="ratio-option">
+              <input type="radio" name="ratio" value="0.85" checked />
+              <span><strong>轻度</strong> · 保留 85%</span>
+            </label>
+            <label class="ratio-option">
+              <input type="radio" name="ratio" value="0.75" />
+              <span><strong>标准</strong> · 保留 75%</span>
+            </label>
+            <label class="ratio-option">
+              <input type="radio" name="ratio" value="0.60" />
+              <span><strong>深度</strong> · 保留 60%</span>
+            </label>
+          </div>
+          <div class="row-actions">
+            <button class="btn btn-primary" id="compressBtn">开始压缩</button>
+          </div>
+        </div>
+
+        <div class="card" id="compressResultCard" hidden>
+          <div class="card-title">压缩结果
+            <button class="btn btn-sm" id="copyCompressBtn">复制</button>
+          </div>
+          <div class="result-box" id="compressResult"></div>
+          <div class="stats-grid" id="compressStats"></div>
+        </div>
+      </section>
+
+      <!-- 页面三：规则分镜 -->
+      <section id="page-storyboard" class="page">
+        <header class="page-header">
+          <h1>规则分镜</h1>
+          <p class="page-desc">纯规则引擎，无需模型：按句拆解口播稿，结合提问/教学/引导等规则生成分镜表。</p>
+        </header>
+
+        <div class="card">
+          <div class="card-title">口播稿</div>
+          <textarea id="storyInput" class="textarea" placeholder="粘贴需要分镜的口播稿……"></textarea>
+          <div class="row-actions">
+            <button class="btn btn-primary" id="storyBtn">生成分镜表</button>
+            <button class="btn btn-sm" id="storyClearBtn">清空</button>
+          </div>
+        </div>
+
+        <div class="card" id="storyResultCard" hidden>
+          <div class="card-title">分镜表
+            <div class="card-actions">
+              <span class="muted" id="storySummary"></span>
+              <button class="btn btn-sm" id="exportStoryBtn">导出文本</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="story-table" id="storyTable"></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 页面五：无限模板（Pro） -->
+      <section id="page-pro" class="page">
+        <header class="page-header">
+          <h1>无限模板 <span class="pro-badge-lg">Pro</span></h1>
+          <p class="page-desc">种子引擎 + 黄金 3 秒钩子强度体系：按平台批量生长口播模板，弱开场自动淘汰，质检通过才沉淀。</p>
+        </header>
+
+        <!-- Pro 门控遮罩：未激活时覆盖整页 -->
+        <div id="proGate" class="pro-gate" hidden>
+          <div class="pro-gate-box">
+            <div class="pro-gate-ico">◆</div>
+            <h2>此功能为 Pro 专属，请升级</h2>
+            <p>无限模板 · 黄金 3 秒钩子强度 · 多平台批量导出</p>
+            <button class="btn btn-primary" id="proGateBtn">立即升级</button>
+          </div>
+        </div>
+
+        <div id="proContent" hidden>
+          <!-- 平台选择 + 生成控制 -->
+          <div class="card">
+            <div class="card-title">平台选择 <span class="muted">开场强度：抖音 / 小红书强制 S 级 · B站 / YouTube S+A 级</span></div>
+            <div class="platform-picker" id="proPlatformPicker"></div>
+            <div class="pro-controls">
+              <label class="count-label">生成数量
+                <input type="number" id="proGenCount" class="count-input" min="1" max="20" value="5" />
+              </label>
+              <button class="btn btn-primary" id="proGenBtn">生成模板</button>
+              <button class="btn" id="proGrowBtn">每日生长</button>
+            </div>
+            <div id="proGenMsg" class="pro-gen-msg"></div>
+          </div>
+
+          <!-- 每日生长结果 -->
+          <div class="card" id="proGrowCard" hidden>
+            <div class="card-title">每日生长统计</div>
+            <div class="stats-grid" id="proGrowStats"></div>
+            <div class="grow-today-title">今日新模板（通过质检）</div>
+            <div class="grow-today-list" id="proGrowToday"></div>
+          </div>
+
+          <!-- 生成/生长的模板列表 -->
+          <div class="pro-results" id="proResults"></div>
+
+          <!-- 多平台批量导出 -->
+          <div class="card" id="proExportCard" hidden>
+            <div class="card-title">多平台批量导出</div>
+            <p class="muted" id="proExportInfo"></p>
+            <div class="export-options">
+              <label class="ratio-option"><input type="radio" name="exportFormat" value="txt" checked /><span><strong>文本</strong>txt</span></label>
+              <label class="ratio-option"><input type="radio" name="exportFormat" value="markdown" /><span><strong>Markdown</strong>md</span></label>
+              <label class="ratio-option"><input type="radio" name="exportFormat" value="srt" /><span><strong>字幕</strong>srt（按句分配时间码）</span></label>
+            </div>
+            <div class="row-actions">
+              <button class="btn btn-primary" id="proExportBtn">导出文件</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 页面六：本地 AI 润色（Pro） -->
+      <section id="page-llm" class="page">
+        <header class="page-header">
+          <h1>本地 AI 润色 <span class="pro-badge-lg">Pro</span></h1>
+          <p class="page-desc">内置本地大模型引擎，全程本地运行，不依赖任何云端服务。粘贴口播稿，一键润色。</p>
+        </header>
+
+        <!-- Pro 门控遮罩：未激活时覆盖整页 -->
+        <div id="llmGate" class="pro-gate" hidden>
+          <div class="pro-gate-box">
+            <div class="pro-gate-ico">✦</div>
+            <h2>此功能为 Pro 专属，请升级</h2>
+            <p>本地 AI 润色 · 全离线运行 · 隐私安全</p>
+            <button class="btn btn-primary" id="llmGateBtn">立即升级</button>
+          </div>
+        </div>
+
+        <div id="llmContent" hidden>
+          <!-- 模型状态卡 -->
+          <div class="card">
+            <div class="card-title">本地模型状态
+              <span class="model-badge" id="llmModelBadge">未下载</span>
+            </div>
+            <div class="model-status-row">
+              <div class="model-info">
+                <div class="model-name" id="llmModelName">--</div>
+                <div class="model-meta" id="llmModelMeta">内存自适应选档中…</div>
+              </div>
+              <div class="model-actions">
+                <button class="btn btn-primary" id="llmDownloadBtn" hidden>下载模型</button>
+                <button class="btn" id="llmDownloadCancelBtn" hidden>取消下载</button>
+                <span class="muted" id="llmDownloadHint" hidden></span>
+              </div>
+            </div>
+            <div class="download-bar" id="llmDownloadBar" hidden>
+              <div class="download-progress" id="llmDownloadProgress"></div>
+            </div>
+            <div class="model-err" id="llmModelErr" hidden></div>
+          </div>
+
+          <!-- 润色输入卡 -->
+          <div class="card">
+            <div class="card-title">润色输入</div>
+            <textarea id="llmInput" class="textarea" placeholder="粘贴你的口播稿 / 文案，点击 AI 润色……"></textarea>
+            <div class="llm-controls">
+              <label class="llm-control">
+                <span>润色指令</span>
+                <select id="llmInstruction" class="select">
+                  <option value="colloquial">口语化改造</option>
+                  <option value="hook">增强钩子冲击力</option>
+                  <option value="compress">压缩冗余</option>
+                  <option value="normalize">风格归一</option>
+                </select>
+              </label>
+              <label class="llm-control">
+                <span>温度 <b id="llmTempVal">0.7</b></span>
+                <input type="range" id="llmTemperature" class="range" min="0" max="1.5" step="0.1" value="0.7" />
+              </label>
+              <div class="row-actions llm-run-actions">
+                <button class="btn btn-primary" id="llmPolishBtn">AI 润色</button>
+                <button class="btn" id="llmCancelBtn" hidden>取消</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 原文 / 润色后 对照卡 -->
+          <div class="card" id="llmCompareCard" hidden>
+            <div class="card-title">润色对照
+              <div class="card-actions">
+                <button class="btn btn-sm" id="llmCopyBtn">复制润色稿</button>
+                <button class="btn btn-sm" id="llmReplaceBtn">替换原文</button>
+              </div>
+            </div>
+            <div class="llm-compare">
+              <div class="llm-pane">
+                <div class="llm-pane-title">原文</div>
+                <div class="llm-pane-body" id="llmOriginal"></div>
+              </div>
+              <div class="llm-pane llm-pane-result">
+                <div class="llm-pane-title">润色后 <span class="llm-engine-tag" id="llmEngineTag" hidden></span></div>
+                <div class="llm-pane-body result-text" id="llmPolished"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 页面七：设置 -->
+      <section id="page-settings" class="page">
+        <header class="page-header">
+          <h1>设置</h1>
+          <p class="page-desc">个性化与授权管理：纯净模式可一键隐藏全部 Pro 推广，Pro 功能依旧保持锁定。</p>
+        </header>
+
+        <div class="card">
+          <div class="card-title">纯净模式 <span class="pro-badge-lg badge-gray" id="pureBadge" hidden>已开启</span></div>
+          <div class="setting-row">
+            <div class="setting-text">
+              <div class="setting-name">隐藏全部 Pro 推广</div>
+              <div class="setting-desc">开启后隐藏侧边栏 Pro 徽标与入口、各 Pro 页面升级遮罩、升级弹窗与推广文案，界面纯净。Pro 功能保持锁定，仅激活码可解锁。</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="pureModeToggle" />
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+          <div id="pureModeNote" class="muted"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Pro 激活</div>
+          <div id="settingsLicenseInfo" class="about-license">正在读取授权状态…</div>
+          <div class="activate-row settings-activate-row">
+            <input type="text" id="settingsActivateInput" class="text-input" placeholder="输入 Pro 激活码（开启后功能即解锁）" />
+            <button class="btn btn-primary" id="settingsActivateBtn">激活</button>
+          </div>
+          <div id="settingsActivateMsg" class="activate-msg"></div>
+        </div>
+      </section>
+
+      <!-- 页面四：关于 -->
+      <section id="page-about" class="page">
+        <header class="page-header">
+          <h1>关于 ShotScript</h1>
+        </header>
+        <div class="card">
+          <div class="about-block">
+            <h2>剧本工坊 · 免费开源版</h2>
+            <p>面向视频创作者的开源 AI 文案工具。三大核心能力全部本地运行，纯净无广告、无需登录。</p>
+            <ul class="about-list">
+              <li><b>固定模板</b> —— 6 款精修口播模板，覆盖 B 站 / 抖音 / 小红书 / YouTube。</li>
+              <li><b>算法精简</b> —— 纯算法压缩口播稿，删除口头禅与冗余，保护专名数字。</li>
+              <li><b>规则分镜</b> —— 纯规则生成分镜表，无需调用任何模型。</li>
+            </ul>
+            <h2>技术栈</h2>
+            <p id="aboutVersions"></p>
+            <div class="about-pro-block">
+              <h2>Pro 授权</h2>
+              <p id="aboutLicenseInfo">正在读取授权状态…</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ===================== Pro 升级弹窗 ===================== -->
+  <div class="modal-mask" id="proModal" hidden>
+    <div class="modal">
+      <button class="modal-close" id="proModalClose">✕</button>
+      <div class="modal-head">
+        <div class="modal-crown">◆</div>
+        <h2>升级 ShotScript Pro</h2>
+        <p class="muted">一次买断 · 全程本地 · 无云依赖</p>
+      </div>
+      <ul class="pro-features">
+        <li><span class="pf-ico">∞</span><div><b>种子引擎 · 无限模板</b><small>海量组合模板，内置黄金 3 秒钩子强度体系</small></div></li>
+        <li><span class="pf-ico">✦</span><div><b>本地 AI 润色</b><small>口播稿一键润色，语气、节奏、情绪全面优化</small></div></li>
+        <li><span class="pf-ico">⇄</span><div><b>多平台导出</b><small>一键导出 B 站 / 抖音 / 小红书 / YouTube 成稿</small></div></li>
+        <li><span class="pf-ico">⚿</span><div><b>Rust 原生引擎</b><small>防拆保护，运行更快更稳，买断制一次付费</small></div></li>
+      </ul>
+      <div class="activate-row">
+        <input type="text" id="activateInput" class="text-input" placeholder="输入 Pro 激活码" />
+        <button class="btn btn-primary" id="activateBtn">激活</button>
+      </div>
+      <div id="activateMsg" class="activate-msg"></div>
+    </div>
+  </div>
+
+  <script src="content_filter.js"></script>
+  <script src="templates.js"></script>
+  <script src="compressor.js"></script>
+  <script src="storyboard.js"></script>
+  <script src="seed_engine.js"></script>
+  <script src="seed_ui.js"></script>
+  <script src="llm_ui.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

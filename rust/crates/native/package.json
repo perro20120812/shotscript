@@ -1,0 +1,8 @@
+{
+  "name": "shotscript-license-native",
+  "version": "0.1.0",
+  "description": "ShotScript 激活码校验原生模块（napi-rs）",
+  "napi": {
+    "name": "shotscript_license"
+  }
+}
