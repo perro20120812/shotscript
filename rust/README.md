@@ -117,4 +117,3 @@ cargo test -p shotscript-license-core
 `rust/keys/example-code.txt` 中存放一条开发密钥签发的示例激活码
 （uid=`demo-creator-2026`，365 天，exp=`1819547352`），用于应用内联调与截图验证。
 它只对**开发公钥**有效；正式发布使用新密钥对后，该码自动失效。
-*（内容由AI生成，仅供参考）*

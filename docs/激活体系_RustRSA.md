@@ -120,4 +120,3 @@ cargo test -p shotscript-license-core
 - macOS arm64，rustc/cargo 1.98.0（aarch64-apple-darwin），经 rustup + rsproxy.cn 镜像安装。
 - Node v24.15.0（`/opt/homebrew/bin/node`），Electron ^41.2.1。
 - Windows 侧构建说明见 `rust/README.md` 第五节。
-*（内容由AI生成，仅供参考）*
