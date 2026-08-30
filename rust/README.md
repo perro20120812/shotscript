@@ -1,13 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6dc4454c9eb3531220c128341ea14345_9dac9d86a3b111f1abe1525400e6dd8f
-    ReservedCode1: I0r7NSkSqthl4ZOVktgnjDc7kQEyi7X7yBcBOL4Y8ujmHEPaLqSTkY+MapCv5AHVWuhmIW5V8OKvOJsEyZfUo4Ga13avhTUJmsDFSlV+jldJyzUnsWXl2KfXKkMmtJ2pXmyqH16TfYHQvUXtk50Hcrsm4WMH9gdxDRLhHUhjjRGdUVKZZe1XrHF8xZk=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6dc4454c9eb3531220c128341ea14345_9dac9d86a3b111f1abe1525400e6dd8f
-    ReservedCode2: I0r7NSkSqthl4ZOVktgnjDc7kQEyi7X7yBcBOL4Y8ujmHEPaLqSTkY+MapCv5AHVWuhmIW5V8OKvOJsEyZfUo4Ga13avhTUJmsDFSlV+jldJyzUnsWXl2KfXKkMmtJ2pXmyqH16TfYHQvUXtk50Hcrsm4WMH9gdxDRLhHUhjjRGdUVKZZe1XrHF8xZk=
----
 
 # ShotScript 激活体系（Rust 原生 RSA 签名校验）
 

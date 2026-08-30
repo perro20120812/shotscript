@@ -1,13 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6dc4454c9eb3531220c128341ea14345_b588616ea43311f1abe1525400e6dd8f
-    ReservedCode1: qjZzOS/DfoVqyKPB9SKfSEAdcBpD1A0AC98jbiJEs67WmuyCxgEiyEPQ5Ge9/HHd0lnNDJyp3GTGjgbM5W2vuNWPsJopmNArsuRrmMK0gh5DLrXFljnIxd6Zp9mu6003grzcIWQT+iN2HpaxQqinNBCk20o8bQrFVxA7xC5uxeXwd/ABAVfWwFN/rOc=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6dc4454c9eb3531220c128341ea14345_b588616ea43311f1abe1525400e6dd8f
-    ReservedCode2: qjZzOS/DfoVqyKPB9SKfSEAdcBpD1A0AC98jbiJEs67WmuyCxgEiyEPQ5Ge9/HHd0lnNDJyp3GTGjgbM5W2vuNWPsJopmNArsuRrmMK0gh5DLrXFljnIxd6Zp9mu6003grzcIWQT+iN2HpaxQqinNBCk20o8bQrFVxA7xC5uxeXwd/ABAVfWwFN/rOc=
----
 
 # ShotScript 剧本工坊
 
