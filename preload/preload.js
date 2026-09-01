@@ -29,8 +29,12 @@ contextBridge.exposeInMainWorld('shotscript', {
     /** 提交激活码校验，成功则持久化激活状态 */
     verify: (code) => ipcRenderer.invoke('license:verify', code),
     /** 查询当前激活状态（主进程启动自动复验） */
-    getStatus: () => ipcRenderer.invoke('license:get-status')
+    getStatus: () => ipcRenderer.invoke('license:get-status'),
+    /** 退出登录（清除本机激活 + 上报登出，用于换机释放） */
+    logout: () => ipcRenderer.invoke('license:logout')
   },
+  /** 打开本地控制面板（127.0.0.1:17680） */
+  openPanel: () => ipcRenderer.invoke('panel:open'),
   /** ===== 本地 AI 润色（Pro）===== */
   llm: {
     /** 查询模型状态 */

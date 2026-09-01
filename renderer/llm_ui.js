@@ -25,7 +25,8 @@
 
   function init() {
     if (!API) {
-      $('#llmModelMeta').textContent = '当前环境未启用本地 AI 能力（无 IPC 桥接）。';
+      const badge = $('#llmModelBadge');
+      if (badge) { badge.textContent = '不可用'; badge.className = 'model-badge badge-err'; }
       return;
     }
     bindEvents();
@@ -72,12 +73,7 @@
     const el = $('#llmModelBadge');
     el.textContent = badge.text;
     el.className = 'model-badge ' + badge.cls;
-
-    if (status.model) {
-      $('#llmModelName').textContent = status.model.label;
-      $('#llmModelMeta').textContent =
-        status.model.sizeLabel + ' · 内存 ' + status.memoryGB.toFixed(1) + 'GB 自适应选档';
-    }
+    // 只展示能力状态徽章，不暴露任何底层模型/引擎名称
 
     // 下载中状态
     const downloading = status.state === 'downloading';

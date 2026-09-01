@@ -15,6 +15,8 @@ rust/crates/tool/
 rust/*.node
 # Pro 闭源模块：本地 AI 推理实现（含模型信息，严禁开源）
 src/llm/
+# Pro 侧本地控制面板（含签发逻辑与私钥引用，严禁开源）
+src/panel/
 # Pro 闭源内部文档（不随开源仓库分发）
 docs/LLM_PRO_本地润色.md
 # 依赖锁文件（含 Pro 推理引擎依赖，不入库）

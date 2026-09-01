@@ -382,9 +382,49 @@
         } else {
           infoEl.innerHTML = 'Pro 未激活<br/><span class="muted">输入激活码即可解锁全部 Pro 功能</span>';
         }
+        // 已激活才显示"退出登录"按钮（换机释放用）
+        const logoutBtn = $('#settingsLogoutBtn');
+        if (logoutBtn) logoutBtn.hidden = !(info && info.uid);
       };
       window.__SHOTSCRIPT_SETTINGS_UI = { refresh: render };
       render();
+    }
+
+    // 退出登录：清除本机激活 + 上报登出（旧设备释放，供换机到新设备）
+    const logoutBtn = $('#settingsLogoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async () => {
+        if (!API.license || !API.license.logout) return;
+        const ok = confirm('确认退出登录？本机 Pro 将恢复锁定状态。如需换机，请先在此设备退出，再到新设备用同一激活码激活。');
+        if (!ok) return;
+        try {
+          await API.license.logout();
+          window.__SHOTSCRIPT_PRO_ACTIVE = false;
+          window.__SHOTSCRIPT_LICENSE_INFO = null;
+          if (window.__SHOTSCRIPT_PRO_UI && window.__SHOTSCRIPT_PRO_UI.applyGate) window.__SHOTSCRIPT_PRO_UI.applyGate();
+          if (window.__SHOTSCRIPT_LLM_UI && window.__SHOTSCRIPT_LLM_UI.applyGate) window.__SHOTSCRIPT_LLM_UI.applyGate();
+          if (window.__SHOTSCRIPT_SETTINGS_UI) window.__SHOTSCRIPT_SETTINGS_UI.refresh();
+          if (window.__SHOTSCRIPT_LICENSE_UI) window.__SHOTSCRIPT_LICENSE_UI.refresh();
+          applyPureModeUI();
+          $('#settingsActivateMsg').className = 'activate-msg ok';
+          $('#settingsActivateMsg').textContent = '已退出登录，本机 Pro 已锁定。';
+        } catch (err) {
+          $('#settingsActivateMsg').className = 'activate-msg err';
+          $('#settingsActivateMsg').textContent = '退出登录失败：' + (err && err.message ? err.message : '未知错误');
+        }
+      });
+    }
+
+    // 打开本地控制面板（127.0.0.1:17680，开发者侧：签发密钥 / 日活监控 / 登入登出）
+    const panelBtn = $('#settingsOpenPanelBtn');
+    if (panelBtn) {
+      panelBtn.addEventListener('click', () => {
+        if (API.openPanel) {
+          API.openPanel();
+        } else if (window.open) {
+          window.open('http://127.0.0.1:17680', '_blank');
+        }
+      });
     }
 
     // 设置页低调激活入口（纯净模式下依然可达，不构成广告）

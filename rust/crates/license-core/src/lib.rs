@@ -22,12 +22,21 @@ fn b64() -> base64::engine::GeneralPurpose {
 }
 
 /// 激活载荷
+///
+/// seats：席位上限。1=个人 Pro（一码一机），5=团队套餐（一码五席位）。
+/// serde 缺省为 1，保证旧版签发（无 seats 字段）仍可解析为个人 Pro。
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct LicensePayload {
     pub uid: String,
     #[serde(rename = "type")]
     pub license_type: String,
     pub exp: i64,
+    #[serde(default = "default_seats")]
+    pub seats: i64,
+}
+
+fn default_seats() -> i64 {
+    1
 }
 
 /// 验签结果

@@ -30,6 +30,8 @@ pub struct LicensePayloadJs {
     #[napi(js_name = "type")]
     pub license_type: String,
     pub exp: i64,
+    /// 席位：1=个人 Pro，5=团队套餐
+    pub seats: i64,
 }
 
 #[napi]
@@ -43,6 +45,7 @@ pub fn verify(activation_code: String) -> LicenseVerifyOutput {
             uid: p.uid,
             license_type: p.license_type,
             exp: p.exp,
+            seats: p.seats,
         }),
     }
 }

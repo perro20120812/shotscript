@@ -13,6 +13,13 @@ try { ({ initLlm } = require('../src/llm/index.js')); } catch (_) { initLlm = nu
 // Pro 激活校验模块（Rust 原生 RSA 验签）
 const license = require('../src/license/index.js');
 
+// 本地控制面板服务（127.0.0.1，开发者侧签发密钥 / 监控日活 / 登入登出记录）
+let startPanel = null;
+try { ({ startPanel } = require('../src/panel/index.js')); } catch (_) { startPanel = null; }
+
+// 遥测（登入/登出/日活上报，本机 JSONL + 本地面板推送）
+const telemetry = require('../src/telemetry/index.js');
+
 // 截图验证模式：启动后自动截取各页面画面并退出（用于自动化验证渲染）
 const SCREENSHOT_MODE = process.env.SHOTSCRIPT_SCREENSHOT === '1';
 const APP_ROOT = path.join(__dirname, '..');
@@ -254,6 +261,8 @@ function createMainWindow() {
         } catch (err) {
           console.error('[shotscript] 截图失败:', err.message);
         } finally {
+          // 截图模式收尾：无论成败一律清除激活残留，防止后续正常启动被自动解锁
+          try { license.clearStore(); } catch (_) { /* ignore */ }
           app.quit();
         }
       }, 3000);
@@ -287,6 +296,17 @@ ipcMain.handle('save-text-file', async (_event, { defaultName, content, extensio
 /** 从剪贴板读取（用于粘贴辅助） */
 ipcMain.handle('clipboard-read', () => clipboard.readText());
 
+// 打开本地控制面板（127.0.0.1:17680），用系统默认浏览器访问
+ipcMain.handle('panel:open', async () => {
+  const { shell } = require('electron');
+  try {
+    await shell.openExternal('http://127.0.0.1:17680');
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+});
+
 app.whenReady().then(() => {
   // 极简 macOS 原生菜单：隐藏默认菜单，保留编辑快捷键能力
   if (process.platform === 'darwin') {
@@ -298,11 +318,37 @@ app.whenReady().then(() => {
     ]));
   }
 
-  // 初始化 Pro 激活校验模块（Rust 原生 RSA 验签 + 状态持久化 + 启动自动复验）
-  license.initLicense();
+  // 初始化 Pro 激活校验模块（Rust 原生 RSA 验签 + 状态持久化 + 启动自动复验 + 设备绑定）
+  const licenseApi = license.initLicense();
+
+  // 启动本地控制面板服务（127.0.0.1:17680，签发密钥 / 日活监控 / 登入登出记录）
+  if (startPanel) {
+    try { startPanel(); } catch (err) { console.error('[panel] 控制面板启动失败:', err.message); }
+  }
 
   // 初始化本地 AI 润色模块（注册 IPC + 内存自适应选档 + 模型探测）
   initLlm();
+
+  // 用户唯一 ID（开源免费版同样分配）+ 启动遥测：
+  // 登录(code 1) 与 活跃(code 3) 对所有用户上报，不限于 Pro 激活；
+  // Pro 激活成功由 license:verify 另行上报登录。
+  try {
+    telemetry.ensureUid();
+    if (telemetry.reportLogin) telemetry.reportLogin(null, { mode: 'launch' });
+    if (telemetry.reportActive) telemetry.reportActive();
+  } catch (_) { /* ignore */ }
+
+  // 启动自动复验：已激活则保持 Pro 态（激活本身由 license:verify 上报，不再重复上报）
+  try {
+    licenseApi.restoreActivation();
+  } catch (_) { /* ignore */ }
+
+  // 应用进程退出（被关闭）时上报 code 4 = 退出（不再活跃）
+  app.on('will-quit', () => {
+    try {
+      if (telemetry.reportQuit) telemetry.reportQuit();
+    } catch (_) { /* ignore */ }
+  });
 
   createMainWindow();
 
